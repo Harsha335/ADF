@@ -1,0 +1,70 @@
+{
+	"name": "DF_reporting",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_AzureSqlTable",
+						"type": "DatasetReference"
+					},
+					"name": "sourceProductDetails"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_AzureSqlTable",
+						"type": "DatasetReference"
+					},
+					"name": "sinkToReportingProductDetails"
+				}
+			],
+			"transformations": [
+				{
+					"name": "getAvgs"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {Series Code} as string,",
+				"          {Product ID} as string,",
+				"          {Department Code} as string,",
+				"          {Series Name} as string,",
+				"          {Brand Code} as string,",
+				"          {Brand URL Code} as string,",
+				"          {Brand Name} as string,",
+				"          {Series Status} as string,",
+				"          {Min Standard Days to Ship} as double,",
+				"          {Max Standard Days to Ship} as double,",
+				"          {Min Standard Unit Price} as double,",
+				"          {Max Standard Unit Price} as double,",
+				"          {Min Price Per Piece} as double,",
+				"          {Max Price Per Piece} as double,",
+				"          {Volume Discount Flag} as string,",
+				"          {Stock Item Flag} as string,",
+				"          {Misumi Flag} as string,",
+				"          {Simple Flag} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sourceProductDetails",
+				"sourceProductDetails aggregate(groupBy({Product ID}),",
+				"     each(match(in(['Min Standard Days to Ship','Max Standard Days to Ship','Min Standard Unit Price','Max Standard Unit Price','Min Price Per Piece','Max Price Per Piece'],name)), 'Avg '+$$ = avg($$))) ~> getAvgs",
+				"getAvgs sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkToReportingProductDetails"
+			]
+		}
+	}
+}

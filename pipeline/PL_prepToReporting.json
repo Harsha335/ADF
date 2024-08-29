@@ -1,9 +1,9 @@
 {
-	"name": "PL_rawToprep",
+	"name": "PL_prepToReporting",
 	"properties": {
 		"activities": [
 			{
-				"name": "DL_RawToPrep",
+				"name": "Data flow generate Avgs",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
@@ -16,16 +16,16 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "DF_rawToprep",
+						"referenceName": "DF_reporting",
 						"type": "DataFlowReference",
 						"datasetParameters": {
-							"sourceCategoryDetails": {
-								"schemaName": "raw",
-								"tableName": "categoryDetails"
-							},
 							"sourceProductDetails": {
-								"schemaName": "raw",
+								"schemaName": "prep",
 								"tableName": "productDetails"
+							},
+							"sinkToReportingProductDetails": {
+								"schemaName": "reporting",
+								"tableName": "avgProductDetails"
 							}
 						}
 					},
@@ -37,8 +37,6 @@
 				}
 			}
 		],
-		"annotations": [],
-		"lastPublishTime": "2024-08-29T19:09:17Z"
-	},
-	"type": "Microsoft.DataFactory/factories/pipelines"
+		"annotations": []
+	}
 }

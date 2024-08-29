@@ -1,5 +1,5 @@
 {
-	"name": "DL_rawToprep",
+	"name": "DF_rawToprep",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
@@ -25,14 +25,14 @@
 						"referenceName": "DS_AzureSqlTable",
 						"type": "DatasetReference"
 					},
-					"name": "sinkToprepCategoryDB"
+					"name": "sinkToPrepCategoryDetails"
 				},
 				{
 					"dataset": {
 						"referenceName": "DS_AzureSqlTable",
 						"type": "DatasetReference"
 					},
-					"name": "sinkToprepProductDB"
+					"name": "sinkToPrepProductDetails"
 				}
 			],
 			"transformations": [
@@ -144,7 +144,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sinkToprepCategoryDB",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkToPrepCategoryDetails",
 				"updateNullValues sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
@@ -155,7 +155,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sinkToprepProductDB"
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkToPrepProductDetails"
 			]
 		}
 	}
