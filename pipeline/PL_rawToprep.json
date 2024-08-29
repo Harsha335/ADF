@@ -26,6 +26,14 @@
 							"sourceProductDetails": {
 								"schemaName": "raw",
 								"tableName": "productDetails"
+							},
+							"sinkToPrepCategoryDetails": {
+								"schemaName": "prep",
+								"tableName": "categoryDetails"
+							},
+							"sinkToPrepProductDetails": {
+								"schemaName": "raw",
+								"tableName": "productDetails"
 							}
 						}
 					},
