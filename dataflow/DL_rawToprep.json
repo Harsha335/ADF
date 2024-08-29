@@ -1,0 +1,162 @@
+{
+	"name": "DL_rawToprep",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "DS_AzureSqlTable",
+						"type": "DatasetReference"
+					},
+					"name": "sourceCategoryDetails"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_AzureSqlTable",
+						"type": "DatasetReference"
+					},
+					"name": "sourceProductDetails"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DS_AzureSqlTable",
+						"type": "DatasetReference"
+					},
+					"name": "sinkToprepCategoryDB"
+				},
+				{
+					"dataset": {
+						"referenceName": "DS_AzureSqlTable",
+						"type": "DatasetReference"
+					},
+					"name": "sinkToprepProductDB"
+				}
+			],
+			"transformations": [
+				{
+					"name": "removeDuplicateRecords"
+				},
+				{
+					"name": "removeHashCodeCol",
+					"description": "remove hash code column"
+				},
+				{
+					"name": "removeDuplicateRecords2"
+				},
+				{
+					"name": "selectRequiredCol",
+					"description": "remove unwanted col."
+				},
+				{
+					"name": "filterNullRecords"
+				},
+				{
+					"name": "updateNullValues"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          {Category Label} as string,",
+				"          {Subcategory Label} as string,",
+				"          {Product Label} as string,",
+				"          {Product ID} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sourceCategoryDetails",
+				"source(output(",
+				"          {Product ID} as string,",
+				"          {Department Code} as string,",
+				"          {Series Code} as string,",
+				"          {Series Name} as string,",
+				"          {Brand Code} as string,",
+				"          {Brand URL Code} as string,",
+				"          {Brand Name} as string,",
+				"          {Series Status} as string,",
+				"          {Min Standard Days to Ship} as string,",
+				"          {Max Standard Days to Ship} as string,",
+				"          {Recommend Flag} as string,",
+				"          {Min Standard Unit Price} as string,",
+				"          {Max Standard Unit Price} as string,",
+				"          {Min Price Per Piece} as string,",
+				"          {Max Price Per Piece} as string,",
+				"          {Volume Discount Flag} as string,",
+				"          {C Value Flag} as string,",
+				"          {Stock Item Flag} as string,",
+				"          {Display Standard Price Flag} as string,",
+				"          {Discontinued Product Flag} as string,",
+				"          {Misumi Flag} as string,",
+				"          {Simple Flag} as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sourceProductDetails",
+				"sourceCategoryDetails aggregate(groupBy(hashCode = sha2(256,columns())),",
+				"     each(match(true()), $$ = first($$))) ~> removeDuplicateRecords",
+				"removeDuplicateRecords select(mapColumn(",
+				"          {Category Label},",
+				"          {Subcategory Label},",
+				"          {Product Label},",
+				"          {Product ID}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> removeHashCodeCol",
+				"filterNullRecords aggregate(groupBy({Series Code}),",
+				"     each(match(name!='Series Code'), $$ = first($$))) ~> removeDuplicateRecords2",
+				"sourceProductDetails select(mapColumn(",
+				"          {Product ID},",
+				"          {Department Code},",
+				"          {Series Code},",
+				"          {Series Name},",
+				"          {Brand Code},",
+				"          {Brand URL Code},",
+				"          {Brand Name},",
+				"          {Series Status},",
+				"          {Min Standard Days to Ship},",
+				"          {Max Standard Days to Ship},",
+				"          {Min Standard Unit Price},",
+				"          {Max Standard Unit Price},",
+				"          {Min Price Per Piece},",
+				"          {Max Price Per Piece},",
+				"          {Volume Discount Flag},",
+				"          {Stock Item Flag},",
+				"          {Misumi Flag},",
+				"          {Simple Flag}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectRequiredCol",
+				"selectRequiredCol filter(not(isNull({Product ID})) || not(isNull({Series Code}))) ~> filterNullRecords",
+				"removeDuplicateRecords2 window(over({Product ID}),",
+				"     asc({Series Code}, true),",
+				"     each(match(in(['Min Standard Days to Ship','Max Standard Days to Ship','Min Standard Unit Price','Max Standard Unit Price','Min Price Per Piece','Max Price Per Piece'],name)), $$ = iif(isNull($$),avg(toDouble($$)),toDouble($$)))) ~> updateNullValues",
+				"removeHashCodeCol sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkToprepCategoryDB",
+				"updateNullValues sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     recreate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkToprepProductDB"
+			]
+		}
+	}
+}

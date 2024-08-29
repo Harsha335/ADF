@@ -1,0 +1,52 @@
+{
+	"name": "PL_rawToprep",
+	"properties": {
+		"activities": [
+			{
+				"name": "DL_RawToPrep",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DL_rawToprep",
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"sourceCategoryDetails": {
+								"schemaName": "raw",
+								"tableName": "categoryDetails"
+							},
+							"sourceProductDetails": {
+								"schemaName": "raw",
+								"tableName": "productDetails"
+							},
+							"sinkToprepCategoryDB": {
+								"schemaName": "prep",
+								"tableName": "categoryDetails"
+							},
+							"sinkToprepProductDB": {
+								"schemaName": "prep",
+								"tableName": "productDetails"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2024-08-29T19:09:17Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
