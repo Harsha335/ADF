@@ -32,7 +32,7 @@
 								"tableName": "categoryDetails"
 							},
 							"sinkToPrepProductDetails": {
-								"schemaName": "raw",
+								"schemaName": "prep",
 								"tableName": "productDetails"
 							}
 						}
