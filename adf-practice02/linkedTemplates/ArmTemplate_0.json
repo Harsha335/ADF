@@ -586,7 +586,7 @@
 										"tableName": "categoryDetails"
 									},
 									"sinkToPrepProductDetails": {
-										"schemaName": "raw",
+										"schemaName": "prep",
 										"tableName": "productDetails"
 									}
 								}
@@ -608,6 +608,113 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/DF_rawToprep')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_master')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "stagingProductDeatils",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "stagingCategoryDetails",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "PL_blobToDB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "cleaning",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "stagingProductDeatils",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "PL_rawToprep",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "reporting",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "cleaning",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "PL_prepToReporting",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "stagingCategoryDetails",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "PL_blobToDB",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/PL_blobToDB')]",
+				"[concat(variables('factoryId'), '/pipelines/PL_rawToprep')]",
+				"[concat(variables('factoryId'), '/pipelines/PL_prepToReporting')]"
 			]
 		}
 	]
