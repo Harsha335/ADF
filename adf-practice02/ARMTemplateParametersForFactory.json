@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-practice02"
+		},
+		"LS_AzureSqlDatabase_password": {
+			"value": ""
+		},
+		"LS_st_assessment1_connectionString": {
+			"value": ""
+		},
+		"LS_AzureSqlDatabase_properties_typeProperties_server": {
+			"value": "practice-server001.database.windows.net"
+		},
+		"LS_AzureSqlDatabase_properties_typeProperties_database": {
+			"value": "DB_misumi"
+		},
+		"LS_AzureSqlDatabase_properties_typeProperties_userName": {
+			"value": "Harsha335"
+		}
+	}
+}
